@@ -9,7 +9,7 @@ Since I am not aware of any simple way in Linux to display the cover art embedde
 - Read-only: MKV files are not modified in any way.
 
 <br><br>
-<img src="Screenshots/CoverSpotter-Portrait.png" width="100%" alt="Coverspotter shows a cover in protrait mode">
+<img src="Screenshots/CoverSpotter-Portrait.png" width="801" alt="Coverspotter shows a cover in protrait mode">
 <figcaption><i>Figure 1: Cover in protrait mode</i></figcaption>
 <br><br>
 
