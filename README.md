@@ -28,7 +28,7 @@ CoverSpotter is written entirely in C++ and utilizes the Qt6 framework. Furtherm
 
 ## License
 
-Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0). You are encouraged to share it with others.
+Licensed under the MIT License. Feel free to use and share it!
 
 ## Credits
 
