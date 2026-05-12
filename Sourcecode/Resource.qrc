@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Images/CoverSpotter-Logo.png</file>
+        <file>Images/CheckmarkWhite.png</file>
+        <file>Images/CheckmarkDark.png</file>
+    </qresource>
+</RCC>
