@@ -23,7 +23,7 @@ CoverSpotter is written entirely in C++ and utilizes the Qt6 framework. Furtherm
 
 <br><br>
 <img src="Screenshots/CoverSpotter-Landscape.png" width="100%" alt="Coverspotter shows a cover in landscape mode">
-<figcaption><i>Figure 1: Cover in landscape mode</i></figcaption>
+<figcaption><i>Figure 2: Cover in landscape mode</i></figcaption>
 <br><br>
 
 ## License
