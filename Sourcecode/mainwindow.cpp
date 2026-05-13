@@ -38,7 +38,7 @@ MainWindow::MainWindow( QWidget *parent )
     imageLabel = new QLabel( "Select or drop an MKV file" );
     imageLabel->setAlignment(Qt::AlignCenter);
 
-    imageLabel->setMinimumSize( CS_MINW, CS_MINH );
+    imageLabel->setMinimumSize( __getCurrentMinW(), __getCurrentMinH() );
     imageLabel->setMaximumSize( QWIDGETSIZE_MAX, QWIDGETSIZE_MAX );
 
     layout->addWidget( imageLabel );
@@ -53,14 +53,19 @@ MainWindow::MainWindow( QWidget *parent )
     cmboExtras = new QComboBox( this );
 
     // Add entries to the ComboBox
-    cmboExtras->addItem( "Extras"         );
-    cmboExtras->addItem( "File Info"      );
-    cmboExtras->addItem( "Portrait Mode"  );
-    cmboExtras->addItem( "Landscape Mode" );
-    cmboExtras->addItem( "Settings"       );
-    cmboExtras->addItem( "About"          );
+    cmboExtras->addItem( "Extras"            );
+    cmboExtras->addItem( "File Info"         );
+    cmboExtras->addItem( "Portrait Mode"     );
+    cmboExtras->addItem( "Landscape Mode"    );
 
-  __updateExtraFileInfoSelectable( false );
+    cmboExtras->addItem( "Size 50% (Alt+1)"  );
+    cmboExtras->addItem( "Size 100% (Alt+2)" );
+    cmboExtras->addItem( "Size 150% (Alt+3)" );
+
+    cmboExtras->addItem( "Settings"          );
+    cmboExtras->addItem( "About"             );
+
+  __updateExtraSelectable( false );
 
     // Add to the layout (e.g., before the Info button)
     footerLayout->addWidget( cmboExtras, 25 );   cmboExtras->setMaximumWidth( 150 );     cmboExtras->setMinimumWidth( 150 );
@@ -132,7 +137,11 @@ MainWindow::MainWindow( QWidget *parent )
                                         cmboExtras->setItemIcon( COMBOBOX_2, QIcon() );     // Remove icon
                                      }
 
-        if ( iIndex == COMBOBOX_4 )  {  // Settings
+        if ( iIndex == COMBOBOX_4 )  {  __changeWindowSize( 1 );  }     // Size 50%
+        if ( iIndex == COMBOBOX_5 )  {  __changeWindowSize( 2 );  }     // 100%
+        if ( iIndex == COMBOBOX_6 )  {  __changeWindowSize( 3 );  }     // 150%
+
+        if ( iIndex == COMBOBOX_7 )  {  // Settings
                                         int iThemeOld = CMI.iTheme;
 
                                         // Open the Settings dialog
@@ -145,7 +154,7 @@ MainWindow::MainWindow( QWidget *parent )
 
                                      }
 
-        if ( iIndex == COMBOBOX_5 )  {  // About
+        if ( iIndex == COMBOBOX_8 )  {  // About
                                         About winAbout;
                                         winAbout.setModal( true );
                                         winAbout.exec();
@@ -310,7 +319,7 @@ bool MainWindow::__getCoverFromMKV( const QString sNewFile, const QString sFN1, 
                             CMI.iCurrentWindoww    = this->width();
                             CMI.iCurrentWindowh    = this->height();
                             // -------------------------------------------
-                          __updateExtraFileInfoSelectable( true );
+                          __updateExtraSelectable( true );
 
                             bFound = true;
                             break;      // End the loop, but don't return yet!
@@ -331,32 +340,6 @@ bool MainWindow::__getCoverFromMKV( const QString sNewFile, const QString sFN1, 
   __showErrorMessage( QString("%1 or %2 not found").arg(sFN1).arg(sFN2) );
     return false;
 
-/*
-
-    // The file does not contain a cover; reset all ads
-    setWindowTitle( "CoverSpotter" );
-
-    if ( CMI.sCurrentFilename.isEmpty() )  imageLabel->setText( "No file loaded" );
-    else  imageLabel->setText( QString("%1 or %2 not found").arg(sFN1).arg(sFN2) );
-
-    CMI.bCurrentValid      = false;
-    CMI.imgCurrentCover    = QImage();       // Leeren
-    CMI.sCurrentFilename.clear();
-    CMI.sCurrentImageName.clear();
-    CMI.iCurrentCoverw     = 0;     CMI.iCurrentCoverh  = 0;
-    CMI.iCurrentWindoww    = 0;     CMI.iCurrentWindowh = 0;
-    CMI.i64CurrentFilesize = 0;
-
-  __updateExtraFileInfoSelectable( false );
-
-    imageLabel->setFixedSize( CS_MINW, CS_MINH );
-    this->resize( 1, 1 );
-    this->adjustSize();
-    imageLabel->setMinimumSize( CS_MINW, CS_MINH );
-    imageLabel->setMaximumSize( QWIDGETSIZE_MAX, QWIDGETSIZE_MAX );
-
-*/
-
 }
 
 
@@ -374,7 +357,7 @@ void MainWindow::__showCover( void )  {
     if ( pixmap.width() > iMax )  pixmap = pixmap.scaledToWidth( iMax, Qt::SmoothTransformation );
 
     // Remove the FixedSize setting after the error occurs
-    imageLabel->setMinimumSize( CS_MINW, CS_MINH );
+    imageLabel->setMinimumSize( __getCurrentMinW(), __getCurrentMinH() );
     imageLabel->setMaximumSize( QWIDGETSIZE_MAX, QWIDGETSIZE_MAX );
 
     // Calculate how much space the layout takes up
@@ -396,15 +379,15 @@ void MainWindow::__showCover( void )  {
            Qt::SmoothTransformation
 
     ));
-    imageLabel->setMinimumSize( CS_MINW, CS_MINH );
+    imageLabel->setMinimumSize( __getCurrentMinW(), __getCurrentMinH() );
 
     // Show title in file name
     QFileInfo xFileInfo( CMI.sCurrentFilename );
     setWindowTitle( xFileInfo.fileName() + " – CoverSpotter" );
 
     // Remember changed window dimensions
-    CMI.iCurrentWindoww    = this->width();
-    CMI.iCurrentWindowh    = this->height();
+    CMI.iCurrentWindoww = this->width();
+    CMI.iCurrentWindowh = this->height();
 
 }
 
@@ -536,14 +519,7 @@ void MainWindow::__changeWindowSize( const int iIndex )  {
 
     if ( CMI.bCurrentValid == false )  return;
 
-    if ( CMI.iMode == CS_PORTRAITMODE )
     switch( iIndex )  {  case 1  :  this->resize( CMI.iCurrentWindoww / 2,   CMI.iCurrentWindowh / 2 );    break;
-                         case 2  :  this->resize( CMI.iCurrentWindoww,       CMI.iCurrentWindowh );        break;
-                         case 3  :  this->resize( CMI.iCurrentWindoww * 1.5, CMI.iCurrentWindowh * 1.5 );  break;
-                      }
-
-    if ( CMI.iMode == CS_LANDSCAPEMODE )
-    switch( iIndex )  {  case 1  :  this->resize( CMI.iCurrentWindoww / 1.5, CMI.iCurrentWindowh / 1.5 );  break;
                          case 2  :  this->resize( CMI.iCurrentWindoww,       CMI.iCurrentWindowh );        break;
                          case 3  :  this->resize( CMI.iCurrentWindoww * 1.5, CMI.iCurrentWindowh * 1.5 );  break;
                       }
@@ -562,7 +538,7 @@ void MainWindow::__resetMainWindowPosSize( void )  {
     QRect rectScreenGeometry = xPrimaryScreen->availableGeometry();
 
     // Set the initial size of the window
-    this->resize( CS_MINW, CS_MINH );
+    this->resize( __getCurrentMinW(), __getCurrentMinH() );
 
     // Move window
     this->move( rectScreenGeometry.left() + 100, rectScreenGeometry.top() + 100 );
@@ -587,27 +563,35 @@ void MainWindow::__setGeomentry( void )  {
 
 
 
-// Set the status of the "File Info" entry in the extra combo box
-void MainWindow::__updateExtraFileInfoSelectable( const bool bValid )  {
-
-    // Access the default model of the ComboBox
+// Set the status of "File Info" and "Size" entries in the extra combo box
+void MainWindow::__updateExtraSelectable( const bool bValid )
+{
+    // Accessing the default model of the combo box
     QStandardItemModel* model = qobject_cast<QStandardItemModel*>( cmboExtras->model() );
 
-    if ( model )  {
+    if ( model )
+    {
+        // Accessing the default model of the combo box
+        const auto lTargetIndices = { COMBOBOX_1, COMBOBOX_4, COMBOBOX_5, COMBOBOX_6 };
 
-        QStandardItem *item = model->item( COMBOBOX_1 );
-        if ( item )  {
+        // Loop through all defined indexes
+        for( int iIndex : lTargetIndices )  {
 
-            // Sets flags: If not valid, it is neither selectable nor active
-            item->setFlags(bValid ? (Qt::ItemIsSelectable | Qt::ItemIsEnabled)
-                                  : Qt::NoItemFlags);
+            QStandardItem *xItem = model->item( iIndex );
 
-            // Optional: Gray out the text color for better feedback
-            item->setData(bValid ? QVariant() : QColor(Qt::gray), Qt::ForegroundRole);
+            if ( xItem )
+            {
+                // Set flags: If bValid is true -> Active & Selectable, otherwise -> Completely disabled
+                xItem->setFlags( bValid ? (Qt::ItemIsSelectable | Qt::ItemIsEnabled)
+                                       : Qt::NoItemFlags );
 
+                // Adjust text color (gray when inactive, default when active)
+                xItem->setData( bValid ? QVariant() : QColor(Qt::gray), Qt::ForegroundRole );
+            }
         }
     }
 }
+
 
 
 
@@ -621,10 +605,10 @@ void MainWindow::__showErrorMessage( const QString sMessage ) {
     // Styling: Roter Hintergrund, weiße Schrift
     errorLabel->setStyleSheet(
 
-        "background-color: red; "
-        "color: white; "
-        "font-weight: bold; "
-        "padding: 10px 20px;"
+            "background-color: red; "
+            "color: white; "
+            "font-weight: bold; "
+            "padding: 10px 20px;"
 
     );
 

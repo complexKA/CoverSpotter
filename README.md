@@ -33,4 +33,5 @@ Licensed under the MIT License. Feel free to use and share it!
 ## Credits
 
 The movie cover shown in the screenshot is a modified version of the "Big Buck Bunny" poster - © copyright 2008, Blender Foundation | www.bigbuckbunny.org
+
 Licensed under Creative Commons Attribution 3.0. https://creativecommons.org/licenses/by/3.0/deed.en

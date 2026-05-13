@@ -1,3 +1,5 @@
+#include "configmanager.h"
+
 #include <QString>
 #include <QStandardPaths>
 #include <QDir>
@@ -14,5 +16,21 @@ QString __getSettingsPath()  {
 
     // Return
     return sPath + "/CoverSpotter.ini";
+
+}
+
+// Helper function: Returns the current minimum width (portrait or landscape, depending on the mode)
+int __getCurrentMinW()  {
+
+    if ( CMI.iMode == CS_LANDSCAPEMODE )  return CS_MINW_LANDSCAPE;
+    return CS_MINW_PORTRAIT;
+
+}
+
+// Helper function: Returns the current minimum height (portrait or landscape, depending on the mode)
+int __getCurrentMinH()  {
+
+    if ( CMI.iMode == CS_LANDSCAPEMODE )  return CS_MINH_LANDSCAPE;
+    return CS_MINH_PORTRAIT;
 
 }
