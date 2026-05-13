@@ -49,7 +49,7 @@ private:
     void      __changeWindowSize( const int );
     void      __resetMainWindowPosSize();
     void      __setGeomentry();
-    void      __updateExtraFileInfoSelectable( const bool );
+    void      __updateExtraSelectable( const bool );
     void      __showErrorMessage( const QString );
 
 };

@@ -3,6 +3,8 @@
 #include "configmanager.h"
 
 #include <QFileInfo>
+#include <QFontMetrics>
+#include <QMessageBox>
 
 
 CSfileinfo::CSfileinfo( QWidget *parent )
@@ -20,7 +22,14 @@ CSfileinfo::CSfileinfo( QWidget *parent )
     // Sets the fixed flags: window type, title, system menu, and only the close button
     // Locks the size to the current values (also disables dragging by the corners)
     this->setWindowFlags( Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint );
-    this->setFixedSize( this->width(), this->height() );
+
+    // Freeze the height completely (min and max are identical)
+    this->setMinimumHeight( this->height() );
+    this->setMaximumHeight( this->height() );
+
+    // Keep the width of the dialog variable between 350 pixels and 1200 pixels
+    this->setMinimumWidth( 350 );
+    this->setMaximumWidth( 1200 );
 
     // If no cover image is loaded
     if ( CMI.bCurrentValid == false )  {  ui->le_FileName->setText(     "No file loaded" );
@@ -41,6 +50,22 @@ CSfileinfo::CSfileinfo( QWidget *parent )
 
     // Further adjustments
     ui->le_FileName->setStyleSheet( LINE_EDIT_CSS );
+
+
+    /////////////////////////////
+    /// Adjust the dialog width to match the text width (up to 700 pixels)
+
+    // QFontMetrics for precise pixel calculations in Qt 6
+    QFontMetrics metrics(ui->le_FileName->font());
+
+    // horizontalAdvance measures the actual width of the text in pixels
+    int iTextWidth = metrics.horizontalAdvance( CMI.sCurrentFilename );
+
+    // Limit the value to between 350 and 700
+    int iFinalWidth = qBound( 350, iTextWidth, 700 );
+
+    // Apply new dialog width
+    this->resize( iFinalWidth, this->sizeHint().height() );
 
 }
 
